@@ -11,9 +11,12 @@ from flask_gravatar import Gravatar
 import functools
 from datetime import datetime as dt
 import smtplib
+from dotenv import load_dotenv
+load_dotenv()
+import os
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
+app.config['SECRET_KEY'] = os.getenv('appSecretKey')
 ckeditor = CKEditor(app)
 Bootstrap(app)
 gravatar = Gravatar(app,
@@ -102,6 +105,8 @@ def admin_only(func):
 @app.route('/')
 def get_all_posts():
     posts = BlogPost.query.all() #print(admin, current_user)
+    print(os.getenv('gpass'))
+    print(app.secret_key)
     return render_template("index.html", all_posts=posts, admin = admin)
 
 
@@ -167,27 +172,19 @@ def about():
     return render_template("about.html")
 
 
-@app.route("/contact")
+@app.route("/contact", methods = ['POST', 'GET'])
 def contact():
+    name = None
     if request.method == 'POST':
-        name = request.form['name']
-        email = request.form['email']
-        phone = request.form['phone']
-        message = request.form['message']
-
+        name, email, phone, message = request.form.to_dict().values()
         with smtplib.SMTP('smtp.gmail.com', 587) as conn:
             conn.ehlo()  # to connect to that SMTP server
             conn.starttls()  # begin encryption
-            conn.login(user='mhabib80@gmail.com', password='extvslwjigaiizox')  # google app-password
+            conn.login(user='mhabib80@gmail.com', password=os.getenv('gpass'))  # google app-password
             conn.sendmail(from_addr=email,
                           to_addrs='mhabib80@gmail.com',
                           msg=f'Subject: New Message from {name}\n\n{message} \n\n {name} \n {phone}')
-
-        return render_template('contact.html', name=name, email=email, phone=phone, message=message)
-
-    else:
-        return render_template('contact.html')
-    return render_template("contact.html")
+    return render_template("contact.html", name = name)
 
 
 @app.route("/new-post",  methods = ['POST', 'GET'])
