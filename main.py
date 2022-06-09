@@ -8,6 +8,7 @@ from sqlalchemy import ForeignKey
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 from forms import *
 from flask_gravatar import Gravatar
+from flask_wtf.csrf import CSRFProtect
 import functools
 from datetime import datetime as dt
 import smtplib
@@ -19,6 +20,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('appSecretKey')
 ckeditor = CKEditor(app)
 Bootstrap(app)
+csrf = CSRFProtect(app)
 gravatar = Gravatar(app,
                     size=100,
                     rating='g',
@@ -174,7 +176,8 @@ def about():
 def contact():
     name = None
     if request.method == 'POST':
-        name, email, phone, message = request.form.to_dict().values()
+        print(request.form.to_dict())
+        _, name, email, phone, message = request.form.to_dict().values()
         with smtplib.SMTP('smtp.gmail.com', 587) as conn:
             conn.ehlo()  # to connect to that SMTP server
             conn.starttls()  # begin encryption
