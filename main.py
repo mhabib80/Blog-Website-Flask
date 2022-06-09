@@ -105,8 +105,6 @@ def admin_only(func):
 @app.route('/')
 def get_all_posts():
     posts = BlogPost.query.all() #print(admin, current_user)
-    print(os.getenv('gpass'))
-    print(app.secret_key)
     return render_template("index.html", all_posts=posts, admin = admin)
 
 

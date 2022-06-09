@@ -55,7 +55,6 @@
             </div>
             <div>
               {% if current_user.is_authenticated %}
-              {{form.csrf_token}}
             {{ ckeditor.load() }}
             {{ ckeditor.config(name='body') }}
             {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
